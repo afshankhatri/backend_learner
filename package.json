@@ -1,0 +1,16 @@
+{
+  "name": "backendproj",
+  "version": "1.0.0",
+  "description": "i'll do some good amount of backend in this folder",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "dev": "nodemon src/index.js"
+  },
+  "author": "afshan khatri",
+  "license": "ISC",
+  "devDependencies": {
+    "nodemon": "^3.1.4",
+    "prettier": "^3.3.3"
+  }
+}

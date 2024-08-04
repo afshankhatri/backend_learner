@@ -1,3 +1,6 @@
+// postman connec nai ho raha 
+
+
 import express from 'express'
 import cors from 'cors'
 import cookieParser from 'cookie-parser'
@@ -8,7 +11,7 @@ app.use(cors({ //cors tells us ...k... kis kis ko access dena hai ...apni websit
     origin:process.env.Proces_origin,
     credentials:true
 }))
-app.use(expre.json({limit:'16kb'}))//this tells us k max kitni bada input lena hai..zayada bada lenge to server crash ho jaiga
+app.use(express.json({limit:'16kb'}))//this tells us k max kitni bada input lena hai..zayada bada lenge to server crash ho jaiga
 app.use(express.urlencoded({extended:true,limit:'16kb'}))//this will help us to encode the the url string's
 app.use(express.static('public')) //this is the name of the folder...where we will stre general data...like logo image etc.
 app.use(cookieParser()) //to get the cookie and use cookie from user
@@ -23,4 +26,22 @@ app.use(cookieParser()) //to get the cookie and use cookie from user
 // if we want middleware ...it will look like this: ..(err,req,res,next)  ..same as above .next will point to the other middleware...if there is no further middleware ...it will stop at the task and will start executing from there
 
 
+
+
+
+// now taking routes  {importing routes}
+
+import userRouter from './routes/user.routes.js'
+
+
+//now routes declaration
+//in the inital day's we used to declare routes like this: app.get('/',(req,res)) ...but here we are exporting our routes ..we will use( app.use)*
+
+app.use('/api/v1/users',userRouter) //userRouter ... this param act as the middleware....it is pointing /user to go in userRouter file and run the function mentioned over there
+
+/*http://localhost:5000/api/v1/users/register*/ //this is how ...it will flow
+
 export {app}
+
+
+

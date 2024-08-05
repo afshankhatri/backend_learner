@@ -32,9 +32,8 @@ app.use(cookieParser()) //to get the cookie and use cookie from user
 // now taking routes  {importing routes}
 
 import userRouter from './routes/user.routes.js'
-
-
 //now routes declaration
+
 //in the inital day's we used to declare routes like this: app.get('/',(req,res)) ...but here we are exporting our routes ..we will use( app.use)*
 
 app.use('/api/v1/users',userRouter) //userRouter ... this param act as the middleware....it is pointing /user to go in userRouter file and run the function mentioned over there

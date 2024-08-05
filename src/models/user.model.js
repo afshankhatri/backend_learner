@@ -54,7 +54,7 @@ const UserSchema = new Schema({
 UserSchema.pre('save',async function(next){
     // this.password will come from above model which we have made 
     if (this.isModified('password')){
-            this.password =  bcrypt.hash(this.password,10) //this tells that whenever the password is updated hash it with 10 rounds(some type of encryption)
+            this.password = await bcrypt.hash(this.password,10) //this tells that whenever the password is updated hash it with 10 rounds(some type of encryption)
             next() 
         }
     else{//we have written if else because ...considering  avtar ..if user changes its avtar from profile and then saves it the whole thing will be changed along with the password(the password wont change but the ...url generated after encryption which change continously )this is not a good thing and might trouble us in long run 

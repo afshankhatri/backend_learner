@@ -12,5 +12,5 @@ const storage = multer.diskStorage({ //there are 2 types of storage disk and mem
   })
 
   
-  
+
 export const upload = multer({ storage })

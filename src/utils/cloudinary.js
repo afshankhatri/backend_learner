@@ -18,20 +18,23 @@ const uploadOnCloudinary = async (localfilepath)=>{
         })  
 
         console.log('file uploaded on cloudinary successfully after this',response.url);
+
+        fs.unlinkSync(localfilepath)//this will remove the file...if we will not do so then sab kuch hamare pas aa k save hota ragega 
         return response
 
     } catch (error) { //if file not uloaded properly 
-        fs.unlink(localfilepath) //this will remove file which is locally uploaded on my server if the connecion failed
+        fs.unlinkSync(localfilepath) //this will remove file which is locally uploaded on my server if the connecion failed
         return null
     }
 }
 
+//just for understanding
 
-cloudinary.v2.uploader.upload('',
-    {public_id:'olympicFlag'},
-    function(error,result){
-        console.log(result);
-    }
-)
+// cloudinary.v2.uploader.upload('',
+//     {public_id:'olympicFlag'},
+//     function(error,result){
+//         console.log(result);
+//     }
+// )
 
 export {uploadOnCloudinary}

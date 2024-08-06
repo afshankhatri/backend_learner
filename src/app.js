@@ -38,7 +38,7 @@ import userRouter from './routes/user.routes.js'
 
 app.use('/api/v1/users',userRouter) //userRouter ... this param act as the middleware....it is pointing /user to go in userRouter file and run the function mentioned over there
 
-/*http://localhost:5000/api/v1/users/register*/ //this is how ...it will flow
+/*http://localhost:3000/api/v1/users/register*/ //this is how ...it will flow
 
 export {app}
 

@@ -18,7 +18,7 @@ const registerUser = asynchandler(async (req,res)=>{
     //9> last return response of the form to the frontend
 
     // step1...
-    const {username,email,passwrord,fullname}=req.body  //destructuring
+    const {username,email,password,fullname}=req.body  //destructuring
     // req.body will put request on frontend(as we did here with postman) the input form the front end will come here and it'll be visible in console if we put console.log (as written below)
     console.log('email:',email);
 
@@ -40,7 +40,7 @@ const registerUser = asynchandler(async (req,res)=>{
     // }//similarly we can do the same thing for all the fields of regi. form
 
     //"some will hlep us to chek all the elements of array"
-    if ([fullname,email,username,passwrord].some((field)=>field?.trim() === ''))
+    if ([fullname,email,username,password].some((field)=>field?.trim() === ''))
     {
         throw new ApiError(400,'all fields are required')
     }
@@ -51,7 +51,7 @@ const registerUser = asynchandler(async (req,res)=>{
 
 
 
-    const ExistedUser = User.findOne({//$or this syntax will alow us to  compare multiple fields of form ...so that we can check if the user exist's or no
+    const ExistedUser = await User.findOne({//$or this syntax will alow us to  compare multiple fields of form ...so that we can check if the user exist's or no
         $or:[{email},{username}]
     })
     if (ExistedUser) {
@@ -64,8 +64,19 @@ const registerUser = asynchandler(async (req,res)=>{
 
 
     const avatarLocalPath = req.files?.avtar[0]?.path 
-    // here multer will req for file ...then it will check for 1st index postn for avarar exists or no then it gets the path
-    const coverimageLocalPath = req.files?.coverimage[0]?.path
+    // here multer will req for file ...then it will check for 1st index postn for avatar exists or no then it gets the path
+
+    // const coverimageLocalPath = req.files?.coverimage[0]?.path
+    // since it is not compulsory to put coverimage ..but when coverimage is not uploaded it gives error......sol>it is due to above syntax it should be manipulated in the way given below:
+    let coverimageLocalPath;
+    if (req.files && Array.isArray(req.files.coverimage) && req.files.coverimage.length>0){
+        coverimageLocalPath = req.files.coverimage[0].path
+    }//similarly we can do this for  avtar as well...(another way)
+
+
+
+    console.log(req.files); //jus to know wht's the output
+    
 
     //to check if images exist or no 
     if(!avatarLocalPath){
@@ -104,9 +115,8 @@ const registerUser = asynchandler(async (req,res)=>{
         avtar:avtar.url,
         coverimage:coverimage?.url ||'', //we have used this syntax over here because ... this tells us that if coverimage exits take it's url otherwise get an empty string
         email,
-        passwrord,
+        password,
         username:username.toLowerCase()
-
     })
 
 
@@ -119,7 +129,9 @@ const registerUser = asynchandler(async (req,res)=>{
 
 
 
-    const userCreated = await user.findById(user._id).select("-password -refreshToken")
+    const createdUser = await User.findById(user._id).select(
+        "-password -refreshToken"
+    )
     //with this method we can get to know if the user if proprly inserted in DB or no and with ._id it will assign automatically a number which will be triversed by findById...and whenever called it will serch for that id 
     //now we dont want to include the refresh token in this so we can remove it with the select() method ...by passing a string in it ...an mentioning the element with minus(-)sign 
 
@@ -135,7 +147,7 @@ const registerUser = asynchandler(async (req,res)=>{
 
 
 
-    if (!userCreated) {
+    if (!createdUser) {
         throw new ApiError(500,'something went while regestering user')
     }
 
@@ -150,9 +162,9 @@ const registerUser = asynchandler(async (req,res)=>{
 
 
     //return res.status(201).json({userCreated})//given below is the better syntax
-    
+
     return res.status(201).json(
-        new ApiResponse(200,userCreated , 'user registered successfully')
+        new ApiResponse(200,createdUser , 'user registered successfully')
     )
 
 

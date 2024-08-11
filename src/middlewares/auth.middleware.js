@@ -1,32 +1,35 @@
-import { verify } from "jsonwebtoken";
-import { asynchandler } from "../utils/asyncHandler";
-import { ApiError } from "../utils/apiERROR";
+import { asynchandler } from "../utils/asyncHandler.js";
+import { ApiError } from "../utils/apiERROR.js";
 import jwt from 'jsonwebtoken'
-import { User } from "../models/user.model";
+import { User } from "../models/user.model.js";
 
 
-export const verifyJWT = asynchandler(async(req, _ /*res(aise bhi likh sakete hai khali "_"...agar 'res'use nai ho raha to ) */,next)=>{//we need to verufy that the user is loggedin or no
+export const verifyJWT = asynchandler(async(req,res,next)=>{//we need to verufy that the user is loggedin or no
     try {
-        const token =  req.cookies?.accessToken  ||req.header('Authorization')?.replace('Bearer','')
+        const token = req.cookies?.accessToken || req.header('Authorization')?.replace('Bearer ', '');
+
     
         if(!token){
             throw new ApiError(401,'Unauthorized')
         }
+
+        
+console.log('Token:', token);//just for reference{debugging statement}
     
-        const decodedToken = jwt.verify(token,process.env.ACCESS_TOKEN_SECRET)
-    
-        const user = await User.findById(decodedToken?._id).select('-password -refreshToken')
+        const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET)
+        console.log('Decoded Token:', decodedToken);
+
+        
+        const user = await User.findById(decodedToken?._id).select("-password -refreshToken")
     
         if (!user) { //if user does not exist
             throw new ApiError(401,'invalid access token')
         }
-    
+
         req.user = user
         next() //is k baad (ye tak complete hone k baad) middleware apne aage k kaam contineu karega...
     } catch (error) {
-        throw new ApiError(401,error?.message || 'invalid access token')
+            throw new ApiError(401, error?.message || "Invalid access token");
     }
-
-
-
+    
 }) 

@@ -6,17 +6,21 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 // given below is the method to bring access token and refresh token at a time
 
 // step 5 directed here from line 235
-const generateAccessAndRefreshTokens = async(userID)=>{ 
+const generateAccessAndRefreshTokens = async(userId)=>{ 
     try {
         //given below is te type of OOP
-        const user = await User.findById(userID)
-        const accesstoken = user.generateAccessToken()//since these are methods we need to give paranthesis
+        const user = await User.findById(userId)
+        const accessToken = user.generateAccessToken()//since these are methods we need to give paranthesis
         const refresToken = user.generateRefreshToken()
 
         user.refresToken = refresToken
         await user.save({validateBeforeSave:false}) //yaha validation nai hoga ab
+        console.log("check:",accessToken);
+        console.log("hey: ",refresToken);
         
-        return {accesstoken,refresToken}
+        
+        
+        return {accessToken,refresToken}
 
 
     } catch (error) {
@@ -210,7 +214,7 @@ const registerLogin = asynchandler(async(req,res)=>{ //this will login user
     
     // step2 verify using username and password 
     // /if (![email,username,password]) { //aise dalege to sab input me dal na padega
-    if (!username || !email) { 
+    if (!(username || email)) { 
         throw new ApiError(400,"username or emal and password is required")
     }
 
@@ -239,7 +243,7 @@ const registerLogin = asynchandler(async(req,res)=>{ //this will login user
 
 
     // step6        {callling of step 5}
-    const {accessToken,refresToken} =await generateAccessAndRefreshTokens(used._id)
+    const {accessToken,refresToken} =await generateAccessAndRefreshTokens(user._id)
 
     const loggedInUser = await User.findById(user._id).select('-refreshToken -password')
 
@@ -251,8 +255,8 @@ const registerLogin = asynchandler(async(req,res)=>{ //this will login user
     //jo niche ki line me likha hu us ko ek line me bhi likh sakte hai...for better readability aise likhte hai
     return res.
     status(200)
-    .cookie("accessToken",accessToken)
-    .cookie('refreshToken',refresToken)
+    .cookie("accessToken",accessToken,options)
+    .cookie('refreshToken',refresToken,options)
     .json(
         new ApiResponse( //we have written this code with reference to ApiResponse.js file
             200, //statuscode
@@ -274,7 +278,7 @@ const logoutUser = asynchandler(async (req,res)=>{//this will logout user
     
     */
     await User.findByIdAndUpdate(
-        req.User._id ,
+        req.user._id ,
         {
             $set:{
                 refresToken:undefined
@@ -293,9 +297,12 @@ const logoutUser = asynchandler(async (req,res)=>{//this will logout user
     return res
     .status(200)
     .clearCookie('accessToken',options)
-    .clearCookie('refreshTOken',options)
+    .clearCookie('refreshToken',options)
     .json(new ApiResponse(200,{},"user logged out"))
 })
+
+
+
 
 export {
     registerUser,

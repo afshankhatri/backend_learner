@@ -14,7 +14,7 @@ app.use(cors({ //cors tells us ...k... kis kis ko access dena hai ...apni websit
 app.use(express.json({limit:'16kb'}))//this tells us k max kitni bada input lena hai..zayada bada lenge to server crash ho jaiga
 app.use(express.urlencoded({extended:true,limit:'16kb'}))//this will help us to encode the the url string's
 app.use(express.static('public')) //this is the name of the folder...where we will stre general data...like logo image etc.
-app.use(cookieParser()) //to get the cookie and use cookie from user
+app.use(cookieParser()) //to get the cookie and use cookie from user........we have made cookies in the file user.controller.js (near line 256 )
 
 
 // to check the app in b/w ...like when we visti a site we view the web after some time when we try to get the thing from the site...it 1st tells us to registered ...if have'nt did so ...that checking of the registration is called is middleware

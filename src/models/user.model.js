@@ -74,6 +74,7 @@ UserSchema.methods.isPasswordCoreect = async function (password) {
 
 // similary creating methods for accessToken...refreshToken...etc
 UserSchema.methods.generateAccessToken = function(){ //contain's more info...expiry is less
+    // access token is given to user ... and refresh token is send to database..so that the user does not need to put the credentials repeatedly 
     return jwt.sign(
         {
             _id:this._id,
@@ -89,6 +90,7 @@ UserSchema.methods.generateAccessToken = function(){ //contain's more info...exp
 }
 // both are similar but used in different way
 UserSchema.methods.generateRefreshToken = function(){ //contains less info...expiry is more 
+    //refresh token is send to database so that when the user comes back to the site ... this refres token will hit the databse and by checking the credentials the user can get the access to the website
     return jwt.sign( 
         {
             _id:this._id

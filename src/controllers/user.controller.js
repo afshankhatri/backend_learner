@@ -3,7 +3,26 @@ import { ApiError } from "../utils/apiERROR.js";
 import { User } from "../models/user.model.js"
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
+// given below is the method to bring access token and refresh token at a time
 
+// step 5 directed here from line 235
+const generateAccessAndRefreshTokens = async(userID)=>{ 
+    try {
+        //given below is te type of OOP
+        const user = await User.findById(userID)
+        const accesstoken = user.generateAccessToken()//since these are methods we need to give paranthesis
+        const refresToken = user.generateRefreshToken()
+
+        user.refresToken = refresToken
+        await user.save({validateBeforeSave:false}) //yaha validation nai hoga ab
+        
+        return {accesstoken,refresToken}
+
+
+    } catch (error) {
+        throw new ApiError(500,"something went wront")
+    }
+}
 const registerUser = asynchandler(async (req,res)=>{
 // the below comments tells us that ... these work need to be done to set up a registration form
     
@@ -173,4 +192,113 @@ const registerUser = asynchandler(async (req,res)=>{
     
 })
 
-export {registerUser}
+const registerLogin = asynchandler(async(req,res)=>{ //this will login user
+// the below comments tells us that ... these work need to be done to set up a todo list  
+
+    //get data from user (req body)
+    //user varification {using either username or email}
+    // save data
+    //display data
+    // check data 
+    //password authentication
+    //if password wrong then give error....If correct then ...generate access and refresh token 
+    //send cookies
+
+
+    // step1 
+    const {email,username,password} = req.body //destructuring
+    
+    // step2 verify using username and password 
+    // /if (![email,username,password]) { //aise dalege to sab input me dal na padega
+    if (!username || !email) { 
+        throw new ApiError(400,"username or emal and password is required")
+    }
+
+    // step3 to find data if it is present in the data base or no
+
+    const user = await User.findOne({ //sicne we want any one from username and email ad we cannot do that with this syntax /...(User.findOne({email}) \... aise karege is se ya to email... ya to username se milega....with the syntax given below we can get access to both 
+        $or :[{username},{email}]
+    })
+
+    // step4 if user does not exist
+    if (!user) {
+        throw new ApiError(404,"user does not exist")        
+    }
+
+    // step 4 chk password using bcrypt
+    const isPasswordValid = await user.isPasswordCoreect(password)
+
+    if (!isPasswordValid) { //if apssword is wrong
+        throw new ApiError(404,"password is incorrect")
+    }
+
+    // step 5    go to line 8 for this step
+
+
+    // **
+
+
+    // step6        {callling of step 5}
+    const {accessToken,refresToken} =await generateAccessAndRefreshTokens(used._id)
+
+    const loggedInUser = await User.findById(user._id).select('-refreshToken -password')
+
+    const options = {  //for cookies ..with the prarmeter given bleow the cookies can only be modified by server and not by the user
+        httpOnly:true,
+        secure:true
+    }
+
+    //jo niche ki line me likha hu us ko ek line me bhi likh sakte hai...for better readability aise likhte hai
+    return res.
+    status(200)
+    .cookie("accessToken",accessToken)
+    .cookie('refreshToken',refresToken)
+    .json(
+        new ApiResponse( //we have written this code with reference to ApiResponse.js file
+            200, //statuscode
+            {
+                user:loggedInUser,accessToken,refresToken //data
+            },
+            'user logged in successfully' //message
+        )
+    )
+})
+
+const logoutUser = asynchandler(async (req,res)=>{//this will logout user
+    //to logout a user we need to clear all the cookies
+    //we need to also clear refresToken
+    /*we need to use our self-made middle ware to logout{
+        we ned to make the middlware because we cannot get the direct access to the id ......
+        apart form that apun wo middlware "auth" wale ko yah abhi likh sakte the ..then phir wo reuable nai hota ...us ko reuable bana ne k liye apun ne alag se 'auth.js' banai
+    }
+    
+    */
+    await User.findByIdAndUpdate(
+        req.User._id ,
+        {
+            $set:{
+                refresToken:undefined
+            }
+        },
+        {
+            new:true
+        }
+    )
+
+    const options = {  //for cookies ..with the prarmeter given bleow the cookies can only be modified by server and not by the user
+        httpOnly:true,
+        secure:true
+    }
+
+    return res
+    .status(200)
+    .clearCookie('accessToken',options)
+    .clearCookie('refreshTOken',options)
+    .json(new ApiResponse(200,{},"user logged out"))
+})
+
+export {
+    registerUser,
+    registerLogin,
+    logoutUser
+}

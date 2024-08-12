@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { logoutUser,registerLogin,registerUser } from "../controllers/user.controller.js";
+import { logoutUser,refreshAccessToken,registerLogin,registerUser } from "../controllers/user.controller.js";
 import { upload } from "../middlewares/multer.middleware.js"; //middleware
 import { verifyJWT } from "../middlewares/auth.middleware.js";
 
@@ -24,5 +24,8 @@ router.route('/login').post(registerLogin)
 
 // secured routes
 router.route('/logout').post(verifyJWT,logoutUser) //with the help of next ...after completing 'verifyJWT' it will directly start working on 'logoutUser' this continous working done due to the presence of next() agar wo nai hota to 'verifyJWT' kar k chod deta aage ka nai karta
+
+router.route("/refresh-Token").post(refreshAccessToken)
+
 
 export default router

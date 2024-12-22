@@ -5,7 +5,7 @@ import { uploadOnCloudinary } from "../utils/cloudinary.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import jwt from 'jsonwebtoken'
 
-// given below is the method to bring access token and refresh token at a time
+// given below is the method to bring access token and refresh token at a time!
 
 // step 5 directed here from line 235
 const generateAccessAndRefreshTokens = async(userId)=>{ 

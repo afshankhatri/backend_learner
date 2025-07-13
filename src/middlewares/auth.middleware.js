@@ -3,7 +3,6 @@ import { ApiError } from "../utils/apiERROR.js";
 import jwt from 'jsonwebtoken'
 import { User } from "../models/user.model.js";
 
-
 export const verifyJWT = asynchandler(async(req,res,next)=>{//we need to verufy that the user is loggedin or no
     try {
         const token = req.cookies?.accessToken || req.header('Authorization')?.replace('Bearer ', '');
